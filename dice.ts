@@ -1,6 +1,8 @@
+import { NamedRolls, ComplexRollResult } from './types.ts'
 
 const simpleExpression = /(?<sign>[+-]*)((?<num>\d*)[dD](?<sides>\d+)|(?<val>\d+))/g
 const wholeDieExpression = /(\+)(\w+)|(\-)(\w+)|()(\w+)/g
+const regexParenMatches = /\((\w+)\)/g
 
 // 2d10
 export async function roll(expression: string) {
@@ -43,37 +45,36 @@ export async function expressionRoll(input: string) {
   return { input, detail, results, sum }
 }
 
-// TODO: Next... Need to accept named rolls.
+// namedRolls: { "attack": "d20+13", "damage": "2d6+13", "rage": "5" }
+// expression: (attack)+(rage)+3 & (damage)+(rage)
+export async function complexRoll(namedRolls: NamedRolls, expression: string) {
+  const usedNamedExpressions: string[] = []
+  const rollableExpressions = expression.replaceAll(' ', '').split('&').map((exp) => {
+    const matches = exp.match(new RegExp(regexParenMatches.source, 'g')) || []
 
-// input = {
-// 	"namedRolls": {
-// 		"attack": "d20+13",
-// 		"damage": "2d6+13",
-// 		"rage": "5"
-// 	},
-// 	"roll": "(attack)+(rage)+3 & (damage)+(rage)"
-// }
-export async function complexRoll(expression: string) {
-  return {}
+    const rollableExpression = matches.reduce((exp, i) => {
+      const match = i.slice(1, -1)
+      usedNamedExpressions.push(match)
+      return exp.replace(i, namedRolls[match])
+    }, exp)
+
+    return { expression: exp, roll: rollableExpression, result: {} }
+  })
+
+  const promises = rollableExpressions.map(async (i: ComplexRollResult) => {
+    const result = await expressionRoll(i.roll)
+    i.result = { sum: result.sum, results: result.results, details: result.detail }
+
+    return i
+  })
+  await Promise.all(promises)
+
+  return { expression, rollableExpressions, namedExpressionsUsed: usedNamedExpressions }
 }
-// output = {
-// 	"input": "(attack)+(rage)+3 & (damage)+(rage)", 
-// 	"detail": [
-// 		[
-// 			{ "name": "attack", "roll": "d20+13", "results": [8, 13] },
-// 			{ "name": "rage", "roll": "5", "results": [5] },
-// 			{ "results": [3] }
-// 		],
-// 		[
-// 			{ "name": "damage", "roll": "2d6+13", "results": [4, 6, 13] },
-// 			{ "name": "rage", "roll": "5", "results": [5] },
-// 		]
-// 	],
-// 	"results": [21, 23],
-// 	"errors": []
-// }
 
-// (attack)+(rage): [8] + 13 = 21
-// (damage)+(rage): [4,6] + 13 = 23
+// (async () => {
+//   const results = await complexRoll({ "attack": "d20+13", "damage": "2d6+13", "rage": "5" }, "(attack)+ (rage) +3& (damage)+(rage)");
+//   console.log(JSON.stringify(results,null,3))
+// })()
 
 // // https://regex101.com/
