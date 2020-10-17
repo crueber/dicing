@@ -28,7 +28,6 @@ export async function roll(expression: string) {
 
   return output; // [2, 8]
 }
-// roll('+d8')
 
 // -2d10+8d4+12
 export async function expressionRoll(input: string) {
@@ -43,8 +42,8 @@ export async function expressionRoll(input: string) {
 
   return { input, detail, results, sum, errors: [] }
 }
-// expressionRoll("-2d10+8d4+12")
 
+// TODO: Next... Need to accept named rolls.
 
 // input = {
 // 	"namedRolls": {
