@@ -5,7 +5,7 @@ const wholeDieExpression = /(\+)(\w+)|(\-)(\w+)|()(\w+)/g
 // 2d10
 export async function roll(expression: string) {
   const result = (new RegExp(simpleExpression.source, 'g')).exec(expression[0] === '+' ? expression.slice(1) : expression)
-  // const result = expression.match(simpleExpression)
+
   const data = result?.groups;
   const output: number[] = [];
 
@@ -40,7 +40,7 @@ export async function expressionRoll(input: string) {
   const results = detail.map((i) => i.results).flat();
   const sum = results.reduce((agg, i) => { return i + agg }, 0)
 
-  return { input, detail, results, sum, errors: [] }
+  return { input, detail, results, sum }
 }
 
 // TODO: Next... Need to accept named rolls.
