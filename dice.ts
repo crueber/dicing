@@ -48,13 +48,13 @@ export async function expressionRoll(input: string) {
 // namedRolls: { "attack": "d20+13", "damage": "2d6+13", "rage": "5" }
 // expression: (attack)+(rage)+3 & (damage)+(rage)
 export async function complexRoll(namedRolls: NamedRolls, expression: string) {
-  const usedNamedExpressions: string[] = []
+  const usedNamedExpressions = new Set()
   const rollableExpressions = expression.replaceAll(' ', '').split('&').map((exp) => {
     const matches = exp.match(new RegExp(regexParenMatches.source, 'g')) || []
 
     const rollableExpression = matches.reduce((exp, i) => {
       const match = i.slice(1, -1)
-      usedNamedExpressions.push(match)
+      usedNamedExpressions.add(match)
       return exp.replace(i, namedRolls[match])
     }, exp)
 
@@ -69,12 +69,12 @@ export async function complexRoll(namedRolls: NamedRolls, expression: string) {
   })
   await Promise.all(promises)
 
-  return { expression, rollableExpressions, namedExpressionsUsed: usedNamedExpressions }
+  return { expression, rollableExpressions, namedExpressionsUsed: Array.from(usedNamedExpressions) }
 }
 
-// (async () => {
-//   const results = await complexRoll({ "attack": "d20+13", "damage": "2d6+13", "rage": "5" }, "(attack)+ (rage) +3& (damage)+(rage)");
-//   console.log(JSON.stringify(results,null,3))
-// })()
+(async () => {
+  const results = await complexRoll({ "attack": "d20+13", "damage": "2d6+13", "rage": "5" }, "(attack)+ (rage) +3& (damage)+(rage)");
+  console.log(JSON.stringify(results,null,3))
+})()
 
 // // https://regex101.com/
