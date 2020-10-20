@@ -6,7 +6,6 @@ import complexRoll from '../complexRoll.ts'
   console.log(JSON.stringify(results,null,3))
 })()
 
-
 // {
 //   "results": [
 //     {

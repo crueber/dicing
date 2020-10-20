@@ -1,6 +1,6 @@
 
 import complexRoll from './complexRoll.ts'
-import { assert, equal } from "https://deno.land/std/testing/asserts.ts";
+import { assert } from "https://deno.land/std/testing/asserts.ts";
 
 const namedRolls = { "attack": "d20+13", "damage": "2d6+13", "rage": "5" }
 
