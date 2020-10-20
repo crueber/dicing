@@ -1,7 +1,8 @@
 
 import { simpleExpression } from './lib/regex.ts'
 
-// 2d10
+// Expression string: [+ - or not present][optional number]d[number]
+// Examples: d6, -d6, +d6, 1d6, -1d6, +1d6, 20d10, 80d100, -100d1000 
 export default async function roll(expression: string) {
   if (!(new RegExp(simpleExpression.source, 'g')).test(expression)) throw new Error('Unable to parse expression')
   const result = (new RegExp(simpleExpression.source, 'g')).exec(expression[0] === '+' ? expression.slice(1) : expression)
