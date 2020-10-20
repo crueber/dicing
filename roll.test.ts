@@ -1,4 +1,4 @@
-import { roll } from './dice.ts'
+import roll from './roll.ts'
 import { assert, equal } from "https://deno.land/std/testing/asserts.ts";
 
 Deno.test("if the environment works", () => {

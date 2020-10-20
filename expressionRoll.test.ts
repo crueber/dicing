@@ -1,4 +1,4 @@
-import { expressionRoll } from './dice.ts'
+import expressionRoll from './expressionRoll.ts'
 import { assert, equal } from "https://deno.land/std/testing/asserts.ts";
 
 Deno.test("basics of and expression when no roll is present", async () => {

@@ -4,7 +4,7 @@ The functions needed to support a dicing web app, essentially.
 
 I'm using deno for all the back end components as a way to "kick the tires".
 
-There is a commented line in the `dice.ts` file that can be uncommented when you `deno run dice.ts` which will show the output more clearly. There is sample output of the complex roller in `dice.3.test.ts`.
+There is a commented line in the `dice.ts` file that can be uncommented when you `deno run complexRoll.ts` which will show the output more clearly. There is sample output of the complex roller in `complexRoll.test.ts`.
 
 This repo is completely stand alone and should be runnable without installing any dependencies (aside from deno core lib).
 
