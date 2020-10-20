@@ -4,7 +4,9 @@ The functions needed to support a dicing web app, essentially.
 
 I'm using deno for all the back end components as a way to "kick the tires".
 
-You can test this by using `scripts/roll.ts` by using `deno run scripts/roll.ts` which will show the output more clearly. There is sample output of the complex roller in `scripts/roll.ts`, too.
+You can test this by using the scripts in the `./scripts` directory. `roll.ts` can take simple expressions, while `complexRoll.ts` has to be modified with the named expressions and the expression itself. These should help you understand exactly how this works.
+
+There is sample output of the complex roller in `scripts/complexRoll.ts`, too.
 
 This repo is completely stand alone and should be runnable without installing any dependencies (aside from deno core lib).
 
