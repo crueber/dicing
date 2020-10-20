@@ -3,6 +3,7 @@ import { simpleExpression, wholeDieExpression, parenMatches } from './regex.ts'
 
 // 2d10
 export async function roll(expression: string) {
+  if (!(new RegExp(simpleExpression.source, 'g')).test(expression)) throw new Error('Unable to parse expression')
   const result = (new RegExp(simpleExpression.source, 'g')).exec(expression[0] === '+' ? expression.slice(1) : expression)
 
   const data = result?.groups;
@@ -68,12 +69,15 @@ export async function complexRoll(expression: string, namedRolls?: NamedRolls) {
   const cleanedExpression = expression.replaceAll(' ', '').replaceAll('&', ' and ')
   const parsedExpression = cleanedExpression.split(' and ')
 
-  const results = await rollExpressions(parsedExpression, namedRolls || {})
-
-  const sum = results.reduce((prev, curr) => { return prev + (curr.sum || 0)}, 0)
-  const complexRoll: ComplexResult = { results, expression: cleanedExpression, sum }
-
-  return complexRoll
+  try {
+    const results = await rollExpressions(parsedExpression, namedRolls || {})
+    const sum = results.reduce((prev, curr) => { return prev + (curr.sum || 0)}, 0)
+    const complexRoll: ComplexResult = { results, expression: cleanedExpression, sum }
+  
+    return complexRoll  
+  } catch(e) {
+    return { results: [], expression: "", sum: 0, error: e.error };
+  }
 }
 
 // (async () => {

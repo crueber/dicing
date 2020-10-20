@@ -6,11 +6,15 @@ Deno.test("if the environment works", () => {
 })
 
 Deno.test("basics of dice", async () => {
-  const result = await roll('')
+  try {
+    const result = await roll('')
+    assert(false)
+  } catch (e) {
+    assert(typeof e.message === 'string')
 
-  assert(typeof result == 'object')
-  assert(Array.isArray(result))
-  result.forEach((i) => assert(typeof i === 'number'))
+    const result = await roll('d6')
+    assert(typeof result === 'object')
+  }
 })
 
 Deno.test("1000 die rolls w/constraints", async () => {
