@@ -1,5 +1,6 @@
-import { NamedRolls, ComplexResult, RollDetails } from './types.ts'
-import { simpleExpression, wholeDieExpression, parenMatches } from './regex.ts'
+
+import { NamedRolls, ComplexResult, RollDetails } from './types/all.ts'
+import { parenMatches } from './lib/regex.ts'
 
 import expressionRoll from './expressionRoll.ts'
 

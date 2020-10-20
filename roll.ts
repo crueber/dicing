@@ -1,5 +1,5 @@
-import { NamedRolls, ComplexResult, RollDetails } from './types.ts'
-import { simpleExpression, wholeDieExpression, parenMatches } from './regex.ts'
+
+import { simpleExpression } from './lib/regex.ts'
 
 // 2d10
 export default async function roll(expression: string) {
