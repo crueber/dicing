@@ -1,4 +1,4 @@
-import { NamedRolls, ComplexRollResult } from './types.ts'
+import { NamedRolls, ComplexResult, RollDetails } from './types.ts'
 import { simpleExpression, wholeDieExpression, parenMatches } from './regex.ts'
 
 // 2d10
@@ -39,37 +39,44 @@ export async function expressionRoll(input: string) {
   const results = detail.map((i) => i.results).flat();
   const sum = results.reduce((agg, i) => { return i + agg }, 0)
 
-  return { input, detail, results, sum }
+  return { roll: input, results, detail, sum }
+}
+
+
+async function rollExpressions(expressions: string[], namedRolls: NamedRolls) {
+  return await Promise.all(expressions.map(async (exp) => {
+    const named: NamedRolls = {}
+
+    const matches = exp.match(new RegExp(parenMatches.source, 'g')) || []
+
+    const roll = matches.reduce((exp, i) => {
+      const match = i.slice(1, -1)
+      named[match] = namedRolls[match]
+      return exp.replace(i, namedRolls[match])
+    }, exp)
+
+    const rollResult: RollDetails = await expressionRoll(roll)
+    if (exp !== roll) rollResult.namedRoll = exp
+
+    return { named, ...rollResult }
+  }))
 }
 
 // namedRolls: { "attack": "d20+13", "damage": "2d6+13", "rage": "5" }
 // expression: (attack)+(rage)+3 & (damage)+(rage)
-export async function complexRoll(namedRolls: NamedRolls, expression: string) {
-  const usedNamedExpressions = new Set()
-  const rollableExpressions = expression.replaceAll(' ', '').split('&').map((exp) => {
-    const matches = exp.match(new RegExp(parenMatches.source, 'g')) || []
+export async function complexRoll(expression: string, namedRolls?: NamedRolls) {
+  const cleanedExpression = expression.replaceAll(' ', '').replaceAll('&', ' and ')
+  const parsedExpression = cleanedExpression.split(' and ')
 
-    const rollableExpression = matches.reduce((exp, i) => {
-      const match = i.slice(1, -1)
-      usedNamedExpressions.add(match)
-      return exp.replace(i, namedRolls[match])
-    }, exp)
+  const results = await rollExpressions(parsedExpression, namedRolls || {})
 
-    return { expression: exp, roll: rollableExpression, result: {} }
-  })
+  const sum = results.reduce((prev, curr) => { return prev + (curr.sum || 0)}, 0)
+  const complexRoll: ComplexResult = { results, expression: cleanedExpression, sum }
 
-  const promises = rollableExpressions.map(async (i: ComplexRollResult) => {
-    const result = await expressionRoll(i.roll)
-    i.result = { sum: result.sum, results: result.results, details: result.detail }
-
-    return i
-  })
-  await Promise.all(promises)
-
-  return { expression, rollableExpressions, namedExpressionsUsed: Array.from(usedNamedExpressions) }
+  return complexRoll
 }
 
 // (async () => {
-//   const results = await complexRoll({ "attack": "d20+13", "damage": "2d6+13", "rage": "5" }, "(attack)+ (rage) +3& (damage)+(rage)");
+//   const results = await complexRoll("(attack)- (rage) +3& (damage)+(rage)", { "attack": "d20+13", "damage": "2d6+13", "rage": "5" });
 //   console.log(JSON.stringify(results,null,3))
 // })()

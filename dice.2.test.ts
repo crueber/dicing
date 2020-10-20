@@ -6,7 +6,7 @@ Deno.test("basics of and expression when no roll is present", async () => {
 
   assert(typeof exp == 'object')
   assert(!!exp.results && Array.isArray(exp.results) && exp.results.length === 0)
-  assert(exp.input === '')
+  assert(exp.roll === '')
   // exp.results.forEach((i) => assert(typeof i === 'number'))
 })
 
@@ -16,7 +16,7 @@ Deno.test("basics of and expression when a roll is present", async () => {
 
   assert(typeof exp == 'object')
   assert(!!exp.results && Array.isArray(exp.results) && exp.results.length === 2)
-  assert(exp.input === theExpression)
+  assert(exp.roll === theExpression)
   exp.results.forEach((i) => assert(typeof i === 'number'))
 })
 
@@ -25,7 +25,7 @@ Deno.test("complex expression (+20d20-5d6+10-5)", async () => {
   const exp = await expressionRoll(theExpression)
 
   assert(typeof exp == 'object')
-  assert(exp.input === theExpression)
+  assert(exp.roll === theExpression)
 
   assert(!!exp.results && Array.isArray(exp.results) && exp.results.length === 27)
   exp.results.forEach((i) => assert(typeof i === 'number'))
